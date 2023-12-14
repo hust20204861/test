@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const cloudinary = require('cloudinary')
+const cloudinary = require('cloudinary').v2;
 
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
@@ -20,11 +20,11 @@ app.use(cookieParser())
 app.use(fileUpload());
 
 //setting up cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key:process.env.CLOUDINARY_API_KEY,
-    api_secret:process.env.CLOUDINARY_API_SECRET
-})
+// cloudinary.config({
+//     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//     api_key:process.env.CLOUDINARY_API_KEY,
+//     api_secret:process.env.CLOUDINARY_API_SECRET
+// })
 
 
 // Import all routes
@@ -40,10 +40,10 @@ app.use('/api/v1', payment)
 app.use('/api/v1', order)
 
 if (process.env.NODE_ENV === 'PRODUCTION') {
-    app.use(express.static(path.join(__dirname, '../front/build')))
+    app.use(express.static(path.join(__dirname, '../frontend/build')))
 
     app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '../front/build/index.html'))
+        res.sendFile(path.resolve(__dirname, '../frontend/build/index.html'))
     })
 }
 

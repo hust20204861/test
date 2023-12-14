@@ -64,7 +64,6 @@ exports.getProducts = catchAsyncErrors(async (req, res, next) => {
         filteredProductsCount,
         products
     })
-
 })
 
 // Get all products (Admin)  =>   /api/v1/admin/products
@@ -76,7 +75,7 @@ exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
         success: true,
         products
     })
-    console.log(products)
+    
 })
 
 
@@ -84,7 +83,6 @@ exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
 exports.getSingleProduct = catchAsyncErrors(async (req, res, next) => {
 
     const product = await Product.findById(req.params.id);
-
     if (!product) {
         return next(new ErrorHandler('Product not found', 404));
     }
@@ -92,10 +90,11 @@ exports.getSingleProduct = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        product
+         product
     })
-
+console.log("output", product)
 })
+
 
 // Update Product   =>   /api/v1/admin/product/:id
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
@@ -110,7 +109,7 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
     if (typeof req.body.images === 'string') {
         images.push(req.body.images)
     } else {
-        images = req.body.images
+        images = req.body.images 
     }
 
     if (images !== undefined) {
@@ -149,7 +148,7 @@ exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
         success: true,
         product
     })
-
+console.log("bbbsaa", product)
 })
 
 // Delete Product   =>   /api/v1/admin/product/:id
@@ -166,7 +165,7 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
         const result = await cloudinary.v2.uploader.destroy(product.images[i].public_id)
     }
 
-    await product.remove();
+    await product.deleteOne();
 
     res.status(200).json({
         success: true,

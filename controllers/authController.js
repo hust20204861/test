@@ -1,5 +1,5 @@
 const User = require('../models/user');
-
+const { IncomingForm } = require('formidable')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const sendToken = require('../utils/jwtToken');
@@ -16,7 +16,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
         width: 150,
         crop: "scale"
     })
-
+console.log(result)
     const { name, email, password } = req.body;
 
     const user = await User.create({
@@ -32,6 +32,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     sendToken(user, 200, res)
 
 })
+
 // Login User  =>  /api/v1/login
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     const { email, password } = req.body;
@@ -52,7 +53,8 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     const isPasswordMatched = await user.comparePassword(password);
 
     if (!isPasswordMatched) {
-        return next(new ErrorHandler('Invalid Email or Password', 401));
+        return next(new ErrorHandler('Invalid Email or Password', 401, ));
+    //    return res.status(401).json({ success: false, message: 'Sai mật khẩu' });
     }
 
     sendToken(user, 200, res)
@@ -66,14 +68,14 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
     if (!user) {
         return next(new ErrorHandler('User not found with this email', 404));
     }
-
+console.log("dfgdf", user)
     // Get reset token
     const resetToken = user.getResetPasswordToken();
 
     await user.save({ validateBeforeSave: false });
 
     // Create reset password url
-    const resetUrl = `${req.protocol}://${req.get('host')}/password/reset/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
 
     const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
 
@@ -255,7 +257,8 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
     })
 
     res.status(200).json({
-        success: true
+        success: true,
+       
     })
 })
 
@@ -271,7 +274,7 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     const image_id = user.avatar.public_id;
     await cloudinary.v2.uploader.destroy(image_id);
 
-    await user.remove();
+    await user.deleteOne();
 
     res.status(200).json({
         success: true,
